@@ -112,9 +112,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="fd.cpp" />
+    <ClCompile Include="scanner.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="fd.h" />
+    <ClInclude Include="scanner.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -2,6 +2,9 @@
 /* scanner .h*/
 #ifndef __SCANNER__H
 #define __SCANNER__H
+#define WHITE_SAPCE_CHAR ' '
+#define TAB_CHAR '\t'
+#define NEW_LINE_CHAR '\n'
 #include "fd.h"
 
 //Token types enumeration
@@ -26,10 +29,10 @@ typedef enum
 }
 LEXEME_TYPE;
 
-// Definition of TOKEN, you can use a clase if you  want 
+// Definition of TOKEN, you can use a class if you  want 
 struct	TOKEN
 {
-	LEXEM_TYPE type;
+	LEXEME_TYPE type;
 	int value;  // can be used instead of the str_ptr for IDs and strings
 	float float_value;
 
@@ -43,14 +46,16 @@ private:
 	// define your functions ..
 	//I would define the following functions..
 	// void skip_comments();
+	bool isNumber(char c);
+	int convertToInteger(char c);
 	// bool check_keyword(...)
-	// TOKEN *get_id(..)
-	// TOKEN *get_string(..)
-	// TOKEN *get_int(..) // gets integers and floats
+	TOKEN *get_id();
+	TOKEN *get_string();
+	TOKEN *get_int(); // gets integers and floats
 
 	public;
 	SCANNER();
-	SCANNER(FileDescriptor *fd) { Fd = fd; /* write other code if needed*/ };
+	SCANNER(FileDescriptor *fd) { Fd = fd; };
 	TOKEN* Scan();
 	// You may define it as TOKEN *Scan(FileDescriptor *fd);
 

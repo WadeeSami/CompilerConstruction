@@ -18,9 +18,15 @@
     <ClCompile Include="fd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="scanner.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="fd.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="scanner.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
