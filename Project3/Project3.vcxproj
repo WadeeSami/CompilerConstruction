@@ -113,10 +113,12 @@
   <ItemGroup>
     <ClCompile Include="fd.cpp" />
     <ClCompile Include="scanner.cpp" />
+    <ClCompile Include="token.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="fd.h" />
     <ClInclude Include="scanner.h" />
+    <ClInclude Include="token.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,6 +1,6 @@
 #include "scanner.h"
 
-//neccesarry arrays
+//neccessary arrays
 int keys = 32; /* number of keywords */
 char *keyword[] = {
 	"and", "begin", "boolean", "by", "constant",
@@ -35,6 +35,22 @@ int SCANNER::convertToInteger(char c)
 	return c - '0';
 }
 
+bool SCANNER::isChar(char c)
+{
+	return ( (c > 'a' && c < 'z' ) || (c > 'A' && c < 'Z') );
+}
+
+bool SCANNER::isAKeyword(char * word)
+{
+	//loop throught the array and check
+	for (int i = 0; i < keys; i++) {
+		if (strcmp(word , keyword[i]) == 0) {
+			return true;
+		}
+	}
+	return false;
+}
+
 TOKEN * SCANNER::get_id()
 {
 	return nullptr;
@@ -50,16 +66,22 @@ TOKEN * SCANNER::get_int()
 	return nullptr;
 }
 
+SCANNER::SCANNER()
+{
+	lineNumber = 1;
+}
+
 TOKEN * SCANNER::Scan()
 {
 	//skip white spaces
 	char peekChar;
 	for (; ; peekChar = Fd->GetChar()) {
 		if (peekChar == WHITE_SAPCE_CHAR || peekChar == TAB_CHAR) {
-
+			continue;
 		}
 		else if (peekChar == NEW_LINE_CHAR) {
 			//next line
+			lineNumber++;
 		}
 		else {
 			break;
@@ -74,5 +96,23 @@ TOKEN * SCANNER::Scan()
 			peekChar = Fd->GetChar();
 		} while (isNumber(peekChar));
 		//return a number token
+		return new INTGER_TOKEN(lx_integer, v);
+	}
+
+	//handle keywords
+	if (isChar(peekChar)) {
+		//collect latters into a phrase
+		char * tempBuffer = new char[MAX_TOEKN_SIZE];
+		int index = 0;
+		do {
+			tempBuffer[index++] = peekChar;
+			peekChar = Fd->GetChar();
+		} while (isChar(peekChar) || isNumber(peekChar));
+		if (isAKeyword(tempBuffer)) {
+			//this is a reserved word, return its token
+		}
+		//this is a new id
+		//create a new token for it
+		return new STRING_TOKEN(lx_identifier, tempBuffer);
 	}
 }
