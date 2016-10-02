@@ -25,10 +25,14 @@ private:
 	bool isChar(char c);
 	bool isAKeyword(char * word);
 	bool isOperator(char * c);
+	void skipWhiteSpaces();
+	TOKEN *handleNumbers();
+	TOKEN *handleKeyWords();
 	TOKEN *get_id();
 	TOKEN *get_string();
 	TOKEN *get_int(); // gets integers and floats
 	int lineNumber ;
+	char peekChar;
 	LEXEME_TYPE getKeyWordLexemeName(char * keyword);
 public:
 	SCANNER();

@@ -69,6 +69,65 @@ bool SCANNER::isOperator(char * c)
 	return false;
 }
 
+void SCANNER::skipWhiteSpaces()
+{
+	while (this->peekChar = Fd->GetChar()) {
+		if (this->peekChar == WHITE_SAPCE_CHAR || this->peekChar == TAB_CHAR) {
+			continue;
+		}
+		else if (this->peekChar == NEW_LINE_CHAR) {
+			//next 
+			this->lineNumber++;
+		}
+		else {
+			break;
+		}
+	}
+	return;
+}
+
+TOKEN * SCANNER::handleNumbers()
+{
+	if (isNumber(this->peekChar)) {
+		int v = 0;
+		do {
+			v = v * 10 + convertToInteger(this->peekChar);
+			this->peekChar = Fd->GetChar();
+			//cout << peekChar << endl;
+		} while (isNumber(this->peekChar));
+		//return a number token
+		return new INTGER_TOKEN(lx_integer, v);
+
+	}
+	return NULL;
+}
+
+TOKEN * SCANNER::handleKeyWords()
+{
+
+	if (isChar(this->peekChar)) {
+		//collect latters into a phrase
+		char * tempBuffer = new char[MAX_TOEKN_SIZE];
+		for (int i = 0; i < MAX_TOEKN_SIZE; i++) {
+			tempBuffer[i] = NULL;
+		}
+		int index = 0;
+		do {
+			tempBuffer[index++] = this->peekChar;
+			this->peekChar = Fd->GetChar();
+		} while (isChar(this->peekChar) || isNumber(this->peekChar));
+		if (isAKeyword(tempBuffer)) {
+			//this is a reserved word, return its token
+			return new KEYWORD_TOKEN(getKeyWordLexemeName(tempBuffer), tempBuffer);
+		}
+		//this is a new id
+		//create a new token for it
+		return new STRING_TOKEN(lx_identifier, tempBuffer);
+	}
+
+	return NULL;
+}
+
 TOKEN * SCANNER::get_id()
 {
 	return nullptr;
@@ -103,66 +162,29 @@ SCANNER::SCANNER()
 
 TOKEN * SCANNER::Scan()
 {
+	this->peekChar = ' ';
 	//skip white spaces
-	char peekChar = ' ';
-	
-	while (peekChar = Fd->GetChar()) {
-		if (peekChar == WHITE_SAPCE_CHAR || peekChar == TAB_CHAR) {
-			
-			continue;
-		}
-		else if (peekChar == NEW_LINE_CHAR) {
-			//next 
-			
-			lineNumber++;
-			return NULL;
-		}
-		else {
-			break;
-		}
-	}
+	this->skipWhiteSpaces();
 
-	//handle numbers
-	if (isNumber(peekChar)) {
-		int v = 0;
-		
-		do {
-			v = v * 10 + convertToInteger(peekChar);
-			peekChar = Fd->GetChar();
-			//cout << peekChar << endl;
-		} while (isNumber(peekChar));
-		//return a number token
-		return new INTGER_TOKEN(lx_integer, v);
+	//handle Numbers
+	TOKEN * numberToken = this->handleNumbers();
+	if (numberToken != NULL) {
+		return numberToken;
 	}
 
 	//handle keywords
-	if (isChar(peekChar)) {
-		//collect latters into a phrase
-		char * tempBuffer = new char[MAX_TOEKN_SIZE];
-		for (int i = 0; i < MAX_TOEKN_SIZE; i++) {
-			tempBuffer[i] = NULL;
+	TOKEN * keyWordToken = this->handleKeyWords();
+		if (keyWordToken != NULL) {
+			return keyWordToken;
 		}
-		int index = 0;
-		do {
-			tempBuffer[index++] = peekChar;
-			peekChar = Fd->GetChar();
-		} while (isChar(peekChar) || isNumber(peekChar));
-		if (isAKeyword(tempBuffer)) {
-			//this is a reserved word, return its token
-			return new KEYWORD_TOKEN( getKeyWordLexemeName(tempBuffer), tempBuffer);
-		}
-		//this is a new id
-		//create a new token for it
-		return new STRING_TOKEN(lx_identifier, tempBuffer);
-	}
-
-	char * opArray = new char[2];
+		return NULL;
+	/*char * opArray = new char[2];
 	opArray[0] = peekChar;
 	if (isOperator(opArray)) {
 		peekChar = Fd->GetChar();
 		opArray[1] = peekChar;
 		
-	}
+	}*/
 }
 
 
