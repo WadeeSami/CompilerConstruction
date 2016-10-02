@@ -58,9 +58,6 @@ FileDescriptor::FileDescriptor(char * FileName)
 	fp = fopen(FileName, "r");
 	if (fp == NULL) perror("Error opening file");
 	
-	int x;
-	cin >> x;
-	
 }
 
 FileDescriptor::~FileDescriptor()
@@ -84,12 +81,4 @@ void FileDescriptor::ReportError(char * msg)
 {
 	cout << msg;
 	cout << "on line " << GetLineNum()<< "of prog.COMP2016" << endl;
-}
-
-int main() {
-	FileDescriptor fd("example.txt");
-	
-	int x;
-	cin >> x;
-	return 0;
 }

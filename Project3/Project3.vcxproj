@@ -113,6 +113,7 @@
   <ItemGroup>
     <ClCompile Include="fd.cpp" />
     <ClCompile Include="scanner.cpp" />
+    <ClCompile Include="test.cpp" />
     <ClCompile Include="token.cpp" />
   </ItemGroup>
   <ItemGroup>

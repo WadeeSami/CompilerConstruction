@@ -4,7 +4,7 @@
 typedef enum
 {
 	/* Literals */
-	lx_identifier, lx_integer, lx_string, lx_float,
+	lx_identifier, lx_integer, lx_string, lx_float,lx_keyword,
 	/* Keywords */
 	kw_program,
 	kw_var, kw_constant, kw_integer, kw_boolean, kw_string, kw_float,
@@ -23,25 +23,43 @@ typedef enum
 LEXEME_TYPE;
 
 
+
 class TOKEN {
 	public:
 	LEXEME_TYPE type;
 	int value;  // can be used instead of the str_ptr for IDs and strings
 	float float_value;
-
 	char *str_ptr;
+	char * operatorName;
+	
 };
 
 class INTGER_TOKEN : public	TOKEN {
 public:
 	INTGER_TOKEN(LEXEME_TYPE, int value);
+	
 };
 
 class FLOAT_TOKEN : public	TOKEN {
+public:
 	FLOAT_TOKEN(LEXEME_TYPE, float value);
+	float getValue();
 };
 
 
 class STRING_TOKEN : public	TOKEN {
+public:
 	STRING_TOKEN(LEXEME_TYPE, char * value);
+	char * getValue();
+};
+
+class KEYWORD_TOKEN : public	TOKEN {
+public:
+	KEYWORD_TOKEN(LEXEME_TYPE type, char * value);
+};
+
+class OPERATOR_TOKEN : public	TOKEN {
+public:
+	OPERATOR_TOKEN(LEXEME_TYPE, char * value);
+	
 };
