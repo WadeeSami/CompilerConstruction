@@ -21,12 +21,12 @@ LEXEME_TYPE key_type[] = {
 };
 
 int operatorsCount = 25; /* number of keywords */
-char * operators[] = {
-	"()", ":" , ":=" ,  "+" , "-" ,
-	"*" , "/" ,  "=" ,  "!=" , "<" ,
-	"<=" , ">" ,  ">=" ,"." , ";" ,
-	"[]"  , "," ,"{}" , "(" , ")",
-	":" , "{" ,"}" , "[" , "]" 
+char  operators[] = {
+	 ':'  ,  '+' , '-' ,
+	'*' , '/' ,  '='  , '<' ,
+	'>'  ,'.' , ';' ,
+	 ',' , '(' , ')',
+	':' , '{' ,'}' , '[' , ']' 
 };
 
 
@@ -60,10 +60,10 @@ bool SCANNER::isAKeyword(char * word)
 	return false;
 }
 
-bool SCANNER::isOperator(char * c)
+bool SCANNER::isOperator(char  c)
 {
 	for (int i = 0; i < operatorsCount; i++) {
-		if (strcmp(c , operators[i]) == 0)
+		if (c == operators[i])
 			return true;
 	}
 	return false;
@@ -128,6 +128,28 @@ TOKEN * SCANNER::handleKeyWords()
 	return NULL;
 }
 
+TOKEN * SCANNER::handleOperators()
+{
+	OPERATOR_TOKEN * operatorToken = NULL;
+	int state = 0;
+	while (1) {
+		switch (state) {
+		case 0:
+			//check the character
+			if (this->peekChar == '>')state = 1;
+			else if (this->peekChar == '<')state = 2;
+			else if (this->peekChar == ':')state = 3;
+			else if (this->peekChar == '!')state = 4;
+			else if (this->isOperator(this->peekChar))state = 5;
+			else return NULL;
+		case 1:
+			this->peekChar = Fd->GetChar();
+			if (this->peekChar == '=')operatorToken = new OPERATOR_TOKEN(lx_ge, "<=");
+		}
+	}
+	return nullptr;
+}
+
 TOKEN * SCANNER::get_id()
 {
 	return nullptr;
@@ -178,13 +200,7 @@ TOKEN * SCANNER::Scan()
 			return keyWordToken;
 		}
 		return NULL;
-	/*char * opArray = new char[2];
-	opArray[0] = peekChar;
-	if (isOperator(opArray)) {
-		peekChar = Fd->GetChar();
-		opArray[1] = peekChar;
-		
-	}*/
+	
 }
 
 

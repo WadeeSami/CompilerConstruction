@@ -24,10 +24,11 @@ private:
 	int convertToInteger(char c);
 	bool isChar(char c);
 	bool isAKeyword(char * word);
-	bool isOperator(char * c);
+	bool isOperator(char c);
 	void skipWhiteSpaces();
 	TOKEN *handleNumbers();
 	TOKEN *handleKeyWords();
+	TOKEN *handleOperators();
 	TOKEN *get_id();
 	TOKEN *get_string();
 	TOKEN *get_int(); // gets integers and floats
