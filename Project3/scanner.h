@@ -35,6 +35,7 @@ private:
 	int lineNumber ;
 	char peekChar;
 	LEXEME_TYPE getKeyWordLexemeName(char * keyword);
+	LEXEME_TYPE getOperatorLexemeName(char operatorCHar);
 public:
 	SCANNER();
 	SCANNER(FileDescriptor *fd) { 

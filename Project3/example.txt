@@ -1,5 +1,10 @@
-1234 Hello and its me 
-I am in 
-This is anan
-
-Then this is somebody 
+!=
+aha
+int
+if
+integer
+>=
+float
+<=
+:=
+=

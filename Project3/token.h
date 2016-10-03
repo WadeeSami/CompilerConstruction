@@ -15,8 +15,8 @@ typedef enum
 	kw_for, kw_from, kw_to, kw_by,
 	kw_function, kw_procedure, kw_return, kw_not, kw_begin, kw_end,
 	/* Operators */
-	lx_Iparen, lx_rparen, lx_lbracket, lx_rbracket,
-	Ix_colon, lx_dot, lx_semicolon, lx_comma, Ix_colon_eq,
+	lx_lparen, lx_rparen, lx_lbracket, lx_rbracket, lx_lcbracket, lx_rcbracket,lx_not,
+	lx_colon, lx_dot, lx_semicolon, lx_comma, lx_colon_eq,
 	lx_plus, lx_minus, lx_star, lx_slash,
 	lx_eq, lx_neq, lx_lt, lx_le, lx_gt, lx_ge, lx_eof
 }

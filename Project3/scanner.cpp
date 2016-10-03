@@ -19,14 +19,22 @@ LEXEME_TYPE key_type[] = {
 	kw_od, kw_or, kw_procedure, kw_program,kw_read, kw_return,
 	kw_string, kw_then, kw_to, kw_true, kw_var, kw_while, kw_write
 };
+LEXEME_TYPE operator_type[] =
+{
+	lx_colon,lx_plus , lx_minus , lx_not ,
+	lx_star ,lx_slash,lx_eq,lx_lt,
+	lx_gt , lx_dot , lx_semicolon,
+	lx_comma, lx_lparen,lx_rparen,
+	lx_lcbracket ,lx_rcbracket ,lx_lbracket,lx_rbracket
+};
 
-int operatorsCount = 25; /* number of keywords */
+int operatorsCount = 18; /* number of operators */
 char  operators[] = {
-	 ':'  ,  '+' , '-' ,
+	 ':'  ,  '+' , '-' ,'!',
 	'*' , '/' ,  '='  , '<' ,
 	'>'  ,'.' , ';' ,
 	 ',' , '(' , ')',
-	':' , '{' ,'}' , '[' , ']' 
+	 '{' ,'}' , '[' , ']' 
 };
 
 
@@ -88,43 +96,46 @@ void SCANNER::skipWhiteSpaces()
 
 TOKEN * SCANNER::handleNumbers()
 {
-	if (isNumber(this->peekChar)) {
-		int v = 0;
-		do {
+	int v = 0;
+	if (isNumber(this->peekChar)) 
+	{
+		do 
+		{
 			v = v * 10 + convertToInteger(this->peekChar);
 			this->peekChar = Fd->GetChar();
-			//cout << peekChar << endl;
 		} while (isNumber(this->peekChar));
 		//return a number token
 		return new INTGER_TOKEN(lx_integer, v);
-
 	}
-	return NULL;
+		return NULL;
 }
 
 TOKEN * SCANNER::handleKeyWords()
 {
-
-	if (isChar(this->peekChar)) {
+	if (isChar(this->peekChar)) 
+	{
 		//collect latters into a phrase
 		char * tempBuffer = new char[MAX_TOEKN_SIZE];
-		for (int i = 0; i < MAX_TOEKN_SIZE; i++) {
+		for (int i = 0; i < MAX_TOEKN_SIZE; i++) 
+		{
 			tempBuffer[i] = NULL;
 		}
 		int index = 0;
-		do {
+		do 
+		{
 			tempBuffer[index++] = this->peekChar;
 			this->peekChar = Fd->GetChar();
 		} while (isChar(this->peekChar) || isNumber(this->peekChar));
-		if (isAKeyword(tempBuffer)) {
+		if (isAKeyword(tempBuffer)) 
+		{
 			//this is a reserved word, return its token
 			return new KEYWORD_TOKEN(getKeyWordLexemeName(tempBuffer), tempBuffer);
 		}
 		//this is a new id
 		//create a new token for it
+		//you must check the syntax of the id
 		return new STRING_TOKEN(lx_identifier, tempBuffer);
 	}
-
 	return NULL;
 }
 
@@ -132,8 +143,9 @@ TOKEN * SCANNER::handleOperators()
 {
 	OPERATOR_TOKEN * operatorToken = NULL;
 	int state = 0;
-	while (1) {
-		switch (state) {
+	while (this->isOperator(this->peekChar) && this->peekChar!='\0') {
+		switch (state) 
+		{
 		case 0:
 			//check the character
 			if (this->peekChar == '>')state = 1;
@@ -142,9 +154,45 @@ TOKEN * SCANNER::handleOperators()
 			else if (this->peekChar == '!')state = 4;
 			else if (this->isOperator(this->peekChar))state = 5;
 			else return NULL;
+			break;
 		case 1:
 			this->peekChar = Fd->GetChar();
-			if (this->peekChar == '=')operatorToken = new OPERATOR_TOKEN(lx_ge, "<=");
+			if (this->peekChar == '=')
+			{
+				this->peekChar = Fd->GetChar();
+				return operatorToken = new OPERATOR_TOKEN(lx_ge, ">=");
+			}
+			break;
+		case 2:
+			this->peekChar = Fd->GetChar();
+			if (this->peekChar == '=')
+			{
+				this->peekChar = Fd->GetChar();
+				return operatorToken = new OPERATOR_TOKEN(lx_le, "<=");
+			}
+			break;
+		case 3:
+			this->peekChar = Fd->GetChar();
+			if (this->peekChar == '=')
+			{
+				this->peekChar = Fd->GetChar();
+				return operatorToken = new OPERATOR_TOKEN(lx_colon_eq, ":=");
+			}
+			break;
+		case 4:
+			this->peekChar = Fd->GetChar();
+			if (this->peekChar == '=')
+			{
+				this->peekChar = Fd->GetChar();
+				return operatorToken = new OPERATOR_TOKEN(lx_neq, "!=");
+			}
+			break;
+		case 5:
+			
+			return operatorToken = new OPERATOR_TOKEN(this->getOperatorLexemeName(this->peekChar), &this->peekChar);
+			break;
+		default:
+			break;
 		}
 	}
 	return nullptr;
@@ -174,7 +222,15 @@ LEXEME_TYPE SCANNER::getKeyWordLexemeName(char * reserevedWord)
 		}
 	}
 }
-
+LEXEME_TYPE SCANNER::getOperatorLexemeName(char operatorCHar)
+{
+	int index;
+	for (index = 0; index < operatorsCount; index++)
+	{
+		if (operatorCHar == operators[index])
+			return operator_type[index];
+	}
+}
 
 
 SCANNER::SCANNER()
@@ -194,13 +250,19 @@ TOKEN * SCANNER::Scan()
 		return numberToken;
 	}
 
-	//handle keywords
+	//handle keywords OR IDs
 	TOKEN * keyWordToken = this->handleKeyWords();
 		if (keyWordToken != NULL) {
 			return keyWordToken;
 		}
+
+	//handle operators
+		TOKEN * operatorToken = this->handleOperators();
+		if (operatorToken != NULL)
+		{
+			return operatorToken;
+		}
 		return NULL;
-	
 }
 
 
