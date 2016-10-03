@@ -24,6 +24,7 @@ private:
 	int convertToInteger(char c);
 	bool isChar(char c);
 	bool isAKeyword(char * word);
+	bool isIdentefier(char * word);
 	bool isOperator(char c);
 	void skipWhiteSpaces();
 	TOKEN *handleNumbers();
@@ -43,6 +44,7 @@ public:
 		lineNumber = 1;
 	};
 	TOKEN* Scan();
+	
 	// You may define it as TOKEN *Scan(FileDescriptor *fd);
 
 };

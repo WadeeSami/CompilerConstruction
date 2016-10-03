@@ -68,6 +68,26 @@ bool SCANNER::isAKeyword(char * word)
 	return false;
 }
 
+bool SCANNER::isIdentefier(char * word)
+{
+	bool legallId = false;
+	if (!isChar(word[0]))
+		return legallId;
+	int index = 1;
+	while (index < MAX_TOEKN_SIZE && (isChar(word[index]) || isNumber(word[index]) || word[index] == '_'))
+	{
+		if (!isNumber(word[index]) && !isChar(word[index]) && word[index] != '_')
+		{
+			legallId = false;
+			break;
+		}
+		else
+			legallId = true;
+		index++;
+	}
+	return legallId;
+}
+
 bool SCANNER::isOperator(char  c)
 {
 	for (int i = 0; i < operatorsCount; i++) {
@@ -112,21 +132,21 @@ TOKEN * SCANNER::handleNumbers()
 
 TOKEN * SCANNER::handleKeyWords()
 {
-	if (isChar(this->peekChar)) 
-	{
 		//collect latters into a phrase
+	if (isChar(this->peekChar))
+	{
 		char * tempBuffer = new char[MAX_TOEKN_SIZE];
-		for (int i = 0; i < MAX_TOEKN_SIZE; i++) 
+		for (int i = 0; i < MAX_TOEKN_SIZE; i++)
 		{
 			tempBuffer[i] = NULL;
 		}
 		int index = 0;
-		do 
+		do
 		{
 			tempBuffer[index++] = this->peekChar;
 			this->peekChar = Fd->GetChar();
 		} while (isChar(this->peekChar) || isNumber(this->peekChar));
-		if (isAKeyword(tempBuffer)) 
+		if (isAKeyword(tempBuffer))
 		{
 			//this is a reserved word, return its token
 			return new KEYWORD_TOKEN(getKeyWordLexemeName(tempBuffer), tempBuffer);
@@ -134,9 +154,14 @@ TOKEN * SCANNER::handleKeyWords()
 		//this is a new id
 		//create a new token for it
 		//you must check the syntax of the id
-		return new STRING_TOKEN(lx_identifier, tempBuffer);
+		if (this->isIdentefier(tempBuffer))
+			return new STRING_TOKEN(lx_identifier, tempBuffer);
+		else
+		{
+			this->Fd->ReportError("Illegal Identfier");
+			return nullptr;
+		}
 	}
-	return NULL;
 }
 
 TOKEN * SCANNER::handleOperators()
@@ -244,17 +269,17 @@ TOKEN * SCANNER::Scan()
 	//skip white spaces
 	this->skipWhiteSpaces();
 
+	//handle keywords OR IDs
+	TOKEN * keyWordToken = this->handleKeyWords();
+	if (keyWordToken != NULL) {
+		return keyWordToken;
+	}
+
 	//handle Numbers
 	TOKEN * numberToken = this->handleNumbers();
 	if (numberToken != NULL) {
 		return numberToken;
 	}
-
-	//handle keywords OR IDs
-	TOKEN * keyWordToken = this->handleKeyWords();
-		if (keyWordToken != NULL) {
-			return keyWordToken;
-		}
 
 	//handle operators
 		TOKEN * operatorToken = this->handleOperators();
