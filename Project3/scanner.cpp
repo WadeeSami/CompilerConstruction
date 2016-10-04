@@ -72,7 +72,10 @@ bool SCANNER::isIdentefier(char * word)
 {
 	bool legallId = false;
 	if (!isChar(word[0]))
+	{
 		return legallId;
+	}
+	legallId = true;
 	int index = 1;
 	while (index < MAX_TOEKN_SIZE && (isChar(word[index]) || isNumber(word[index]) || word[index] == '_'))
 	{
@@ -86,6 +89,94 @@ bool SCANNER::isIdentefier(char * word)
 		index++;
 	}
 	return legallId;
+}
+
+bool SCANNER::isInteger(char * word)
+{
+	if(!isNumber(word[0]))
+		return false;
+	int index = 1;
+	bool isInteger = true;
+	while (index < MAX_TOEKN_SIZE)
+	{
+		if (!isNumber(word[index]) && word[index]!='\0')
+		{
+			isInteger = false;
+			break;
+		}
+		index++;
+	}
+	return isInteger;
+}
+
+bool SCANNER::isFloat(char * word)
+{
+	if (atof(word) == 0.0)
+		return false;
+	else
+		return true;
+}
+
+TOKEN * SCANNER::isOpertor(char * word)
+{
+	OPERATOR_TOKEN * operatorToken = NULL;
+	int index = 0;
+	int state = 0;
+	while (this->isOperator(word[index]) && word[index] != '\0') {
+		switch (state)
+		{
+		case 0:
+			//check the character
+			if (word[index] == '>')state = 1;
+			else if (word[index] == '<')state = 2;
+			else if (word[index] == ':')state = 3;
+			else if (word[index] == '!')state = 4;
+			else if (this->isOperator(word[index]))state = 5;
+			else return NULL;
+			break;
+		case 1:
+			index++;
+			if (word[index] == '=')
+			{
+				//this->peekChar = Fd->GetChar();
+				return operatorToken = new OPERATOR_TOKEN(lx_ge, ">=");
+			}
+			break;
+		case 2:
+			index++;
+			if (word[index] == '=')
+			{
+				//this->peekChar = Fd->GetChar();
+				return operatorToken = new OPERATOR_TOKEN(lx_le, "<=");
+			}
+			break;
+		case 3:
+			//this->peekChar = Fd->GetChar();
+			index++;
+			if (word[index] == '=')
+			{
+				//this->peekChar = Fd->GetChar();
+				return operatorToken = new OPERATOR_TOKEN(lx_colon_eq, ":=");
+			}
+			break;
+		case 4:
+			//this->peekChar = Fd->GetChar();
+			index++;
+			if (word[index] == '=')
+			{
+				//this->peekChar = Fd->GetChar();
+				return operatorToken = new OPERATOR_TOKEN(lx_neq, "!=");
+			}
+			break;
+		case 5:
+			return operatorToken = new OPERATOR_TOKEN(this->getOperatorLexemeName(word[index]), &word[index]);
+			break;
+		default:
+			index++;
+			break;
+		}
+	}
+	return false;
 }
 
 bool SCANNER::isOperator(char  c)
@@ -112,6 +203,25 @@ void SCANNER::skipWhiteSpaces()
 		}
 	}
 	return;
+}
+
+char * SCANNER::readingToken()
+{
+	this->peekChar = ' ';
+	//skip white spaces
+	this->skipWhiteSpaces();
+	char * tempBuffer = new char[MAX_TOEKN_SIZE];
+	for (int i = 0; i < MAX_TOEKN_SIZE; i++)
+	{
+		tempBuffer[i] = NULL;
+	}
+	int index = 0;
+	do
+	{
+		tempBuffer[index++] = this->peekChar;
+		this->peekChar = Fd->GetChar();
+	} while (!isspace(this->peekChar) && index <MAX_TOEKN_SIZE && this->peekChar!='\0');
+	return tempBuffer;
 }
 
 TOKEN * SCANNER::handleNumbers()
@@ -265,12 +375,34 @@ SCANNER::SCANNER()
 
 TOKEN * SCANNER::Scan()
 {
+	bool error = false;
+	char*token=this->readingToken();
+	//cout << "token1 " <<token << endl;
+	if (isAKeyword(token)) //if is it a keyword
+		return new KEYWORD_TOKEN(this->getKeyWordLexemeName(token), token);
+	else if (isIdentefier(token)) //if is it an id
+		return new STRING_TOKEN(lx_identifier, token);
+	else if (isInteger(token)) //if is it an integer
+		return new INTGER_TOKEN(lx_integer, atoi(token));
+	else if (isFloat(token)) //if is it a float
+		return new FLOAT_TOKEN(lx_float, atof(token));
+	else if (isOpertor(token) != NULL)
+		return isOpertor(token); //if is it an OP
+
+	if (this->peekChar == WHITE_SAPCE_CHAR || this->peekChar == TAB_CHAR)
+	{
+		//cout << "token2 " << token << endl;
+		token = this->readingToken();
+	}
+
+	if (this->peekChar == '\n' || error)
+		return NULL;
+	/*
 	this->peekChar = ' ';
 	//skip white spaces
-	this->skipWhiteSpaces();
-
+	this->skipWhiteSpaces();	
 	//handle keywords OR IDs
-	TOKEN * keyWordToken = this->handleKeyWords();
+	/*TOKEN * keyWordToken = this->handleKeyWords();
 	if (keyWordToken != NULL) {
 		return keyWordToken;
 	}
@@ -287,7 +419,7 @@ TOKEN * SCANNER::Scan()
 		{
 			return operatorToken;
 		}
-		return NULL;
+		return NULL;*/
 }
 
 

@@ -25,8 +25,12 @@ private:
 	bool isChar(char c);
 	bool isAKeyword(char * word);
 	bool isIdentefier(char * word);
+	bool isInteger(char*word);
+	bool isFloat(char*word);
+	TOKEN* isOpertor(char*word);
 	bool isOperator(char c);
 	void skipWhiteSpaces();
+	char*readingToken();
 	TOKEN *handleNumbers();
 	TOKEN *handleKeyWords();
 	TOKEN *handleOperators();
@@ -44,7 +48,6 @@ public:
 		lineNumber = 1;
 	};
 	TOKEN* Scan();
-	
 	// You may define it as TOKEN *Scan(FileDescriptor *fd);
 
 };

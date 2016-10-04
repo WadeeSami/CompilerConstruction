@@ -1,10 +1,5 @@
-!=
-aha
-int
-if
-integer
+void main ()
+{
+	integer x = 123 ;
+}
 >=
-float
-<=
-:=
-=
