@@ -1,10 +1,10 @@
-!=
-aha
-int
-if
-integer
->=
-float
-<=
-:=
-=
+##Hello from the other side
+A := A + 1. - 3 
+A := 8
+
+A := A + 10
+
+if ( x > 10 ) then {
+	x := 20
+}
+

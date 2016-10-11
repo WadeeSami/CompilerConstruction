@@ -1,4 +1,6 @@
 #include "scanner.h"
+#include <regex>
+
 #include <iostream>
 using namespace std;
 //neccessary arrays
@@ -30,11 +32,11 @@ LEXEME_TYPE operator_type[] =
 
 int operatorsCount = 18; /* number of operators */
 char  operators[] = {
-	 ':'  ,  '+' , '-' ,'!',
+	':'  ,  '+' , '-' ,'!',
 	'*' , '/' ,  '='  , '<' ,
 	'>'  ,'.' , ';' ,
-	 ',' , '(' , ')',
-	 '{' ,'}' , '[' , ']' 
+	',' , '(' , ')',
+	'{' ,'}' , '[' , ']'
 };
 
 
@@ -51,7 +53,7 @@ int SCANNER::convertToInteger(char c)
 
 bool SCANNER::isChar(char c)
 {
-	return ( (c >= 'a' && c <= 'z' ) || (c >= 'A' && c <= 'Z') );
+	return ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'));
 }
 
 bool SCANNER::isAKeyword(char * word)
@@ -60,8 +62,8 @@ bool SCANNER::isAKeyword(char * word)
 	//loop through the array and check
 	//cout<<strcat(word, "\0");
 	for (int i = 0; i < keys; i++) {
-		
-		if (strcmp(word , keyword[i]) == 0) {
+
+		if (strcmp(word, keyword[i]) == 0) {
 			return true;
 		}
 	}
@@ -70,22 +72,8 @@ bool SCANNER::isAKeyword(char * word)
 
 bool SCANNER::isIdentefier(char * word)
 {
-	bool legallId = false;
-	if (!isChar(word[0]))
-		return legallId;
-	int index = 1;
-	while (index < MAX_TOEKN_SIZE && (isChar(word[index]) || isNumber(word[index]) || word[index] == '_'))
-	{
-		if (!isNumber(word[index]) && !isChar(word[index]) && word[index] != '_')
-		{
-			legallId = false;
-			break;
-		}
-		else
-			legallId = true;
-		index++;
-	}
-	return legallId;
+	return std::regex_match(word, std::regex("[a-zA-Z][a-zA-Z0-9_]*"));
+
 }
 
 bool SCANNER::isOperator(char  c)
@@ -116,23 +104,54 @@ void SCANNER::skipWhiteSpaces()
 
 TOKEN * SCANNER::handleNumbers()
 {
-	int v = 0;
-	if (isNumber(this->peekChar)) 
-	{
-		do 
-		{
-			v = v * 10 + convertToInteger(this->peekChar);
+	//int v = 0;
+	//if (isNumber(this->peekChar)) 
+	//{
+	//	do 
+	//	{
+	//		v = v * 10 + convertToInteger(this->peekChar);
+	//		this->peekChar = Fd->GetChar();
+	//	} while (isNumber(this->peekChar));
+	//	//return a number token
+	//	return new INTGER_TOKEN(lx_integer, v);
+	//}
+	if (isNumber(this->peekChar)) {
+		char numberString[MAX_TOEKN_SIZE] = { '\0' };
+		int index = 0;
+		bool isFloat = false;
+		while (isNumber(this->peekChar) || this->peekChar == DOT_CHARACTER && !isFloat) {
+			if (this->peekChar == DOT_CHARACTER) {
+				isFloat = true;
+				this->peekChar = Fd->GetChar();
+				char tempDot = this->peekChar;
+				Fd->unGetChar(this->peekChar);
+				if (!this->isNumber(this->peekChar)) {
+					//error
+					this->errorThrown = true;
+					return NULL;
+				}
+				this->peekChar = tempDot;
+			}
+			numberString[index++] = this->peekChar;
 			this->peekChar = Fd->GetChar();
-		} while (isNumber(this->peekChar));
-		//return a number token
-		return new INTGER_TOKEN(lx_integer, v);
+		}
+		cout << "This is an integer" << endl;
+		//make sure it's a number 
+		if (isFloat) {
+			cout << "Hello " << atof(numberString) << endl;
+			return new FLOAT_TOKEN(lx_float, atof(numberString));
+		}
+		else {
+			cout << "Hello " << atoi(numberString) << endl;
+			return new INTGER_TOKEN(lx_integer, atoi(numberString));
+		}
 	}
-		return NULL;
+	return NULL;
 }
 
 TOKEN * SCANNER::handleKeyWords()
 {
-		//collect latters into a phrase
+	//collect latters into a phrase
 	if (isChar(this->peekChar))
 	{
 		char * tempBuffer = new char[MAX_TOEKN_SIZE];
@@ -168,8 +187,8 @@ TOKEN * SCANNER::handleOperators()
 {
 	OPERATOR_TOKEN * operatorToken = NULL;
 	int state = 0;
-	while (this->isOperator(this->peekChar) && this->peekChar!='\0') {
-		switch (state) 
+	while (this->isOperator(this->peekChar) && this->peekChar != '\0') {
+		switch (state)
 		{
 		case 0:
 			//check the character
@@ -213,12 +232,32 @@ TOKEN * SCANNER::handleOperators()
 			}
 			break;
 		case 5:
-			
+
 			return operatorToken = new OPERATOR_TOKEN(this->getOperatorLexemeName(this->peekChar), &this->peekChar);
 			break;
 		default:
 			break;
 		}
+	}
+	return nullptr;
+}
+
+TOKEN * SCANNER::handleStrings()
+{
+	char  stringValue[MAX_TOEKN_SIZE] = {};
+
+	int index = 0;
+	if (this->peekChar == DOUBLE_QUOTE_CHAR) {
+		while ((this->peekChar = Fd->GetChar()) != DOUBLE_QUOTE_CHAR) {
+			if (this->peekChar == NEW_LINE_CHAR) {
+				//throw an error
+				this->Fd->ReportError("Illegal String Identifier");
+				this->errorThrown = true;
+				return NULL;
+			}
+			stringValue[index++] = this->peekChar;
+		}
+		return new STRING_TOKEN(lx_string, stringValue);
 	}
 	return nullptr;
 }
@@ -238,9 +277,48 @@ TOKEN * SCANNER::get_int()
 	return nullptr;
 }
 
+void SCANNER::skipComments()
+{
+	if (this->peekChar == COMMENT_CHAR) {
+		//check the next
+		this->peekChar = Fd->GetChar();
+		if (this->peekChar == COMMENT_CHAR) {
+			//keep reading until you reach other # or the line ends
+			while ((this->peekChar = Fd->GetChar()) != COMMENT_CHAR) {
+				if ((this->peekChar == NEW_LINE_CHAR) || (this->peekChar == '\0')) {
+					cout << "This is a comment" << endl;
+					return;
+				}
+				continue;
+			}
+
+			//now a comment character in then end of the comment
+			if (Fd->GetChar() == COMMENT_CHAR) {
+				cout << "This is a comment" << endl;
+				return;
+			}
+			else {
+				this->Fd->ReportError("Illegal Identfier");
+				Fd->unGetChar(this->peekChar);
+				this->errorThrown = true;
+				return;
+			}
+		}
+		else {
+			//throught an error
+			this->Fd->ReportError("Illegal Identfier");
+			this->errorThrown = true;
+			return;
+		}
+	}
+	else {
+		return;
+	}
+}
+
 LEXEME_TYPE SCANNER::getKeyWordLexemeName(char * reserevedWord)
 {
-	int index ;
+	int index;
 	for (index = 0; index < keys; index++) {
 		if (strcmp(reserevedWord, keyword[index]) == 0) {
 			return key_type[index];
@@ -265,16 +343,29 @@ SCANNER::SCANNER()
 
 TOKEN * SCANNER::Scan()
 {
+	this->errorThrown = false;
 	this->peekChar = ' ';
 	//skip white spaces
 	this->skipWhiteSpaces();
 
+	//skip comments
+	this->skipComments();
+	if (this->errorThrown) {
+		return NULL;
+	}
+
+	//this->peekChar = Fd->GetChar();
 	//handle keywords OR IDs
 	TOKEN * keyWordToken = this->handleKeyWords();
 	if (keyWordToken != NULL) {
 		return keyWordToken;
 	}
 
+	//handle String
+	TOKEN * stringToken = this->handleStrings();
+	if (stringToken != NULL) {
+		return stringToken;
+	}
 	//handle Numbers
 	TOKEN * numberToken = this->handleNumbers();
 	if (numberToken != NULL) {
@@ -282,12 +373,12 @@ TOKEN * SCANNER::Scan()
 	}
 
 	//handle operators
-		TOKEN * operatorToken = this->handleOperators();
-		if (operatorToken != NULL)
-		{
-			return operatorToken;
-		}
-		return NULL;
+	TOKEN * operatorToken = this->handleOperators();
+	if (operatorToken != NULL)
+	{
+		return operatorToken;
+	}
+	return NULL;
 }
 
 

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <regex>
 #include "scanner.h"
 using namespace std;
 
@@ -27,13 +28,14 @@ int main() {
 	SCANNER scanner(fd);
 	TOKEN * t = NULL;
 	int i = 0;
-	while (fd->GetCurrLine()!=NULL) {
+	while (fd->GetCurrLine() != NULL) {
 		while ((t = scanner.Scan()) != NULL) {
 			//cout << t->str_ptr ;
-			cout <<++i<<"\t" << t->type <<"\t"<< Lexemes[t->type] << endl;
+			cout << ++i << "\t" << t->type << "\t" << Lexemes[t->type] << endl;
 		}
 	}
-		
+
+
 	int x = 0;
 	cin >> x;
 	return 0;

@@ -29,7 +29,7 @@ public:
 	//FileDescriptor(); //opens the stdin
 	void Close(); // closes the file descriptor
 	char GetChar(); // Gets the current character in the file
-	//				//bool open_file_descriptor (char *filename);
+					//				//bool open_file_descriptor (char *filename);
 	void ReportError(char *msg); // reports the error specifying the current line and //character
-	//void UngetChar(char c); // puts back the current character, modifies char number
+	void unGetChar(char c); // puts back the current character, modifies char number
 };
