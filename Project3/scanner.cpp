@@ -115,19 +115,24 @@ TOKEN * SCANNER::handleNumbers()
 	//	//return a number token
 	//	return new INTGER_TOKEN(lx_integer, v);
 	//}
-	if (isNumber(this->peekChar)) {
+	if (isNumber(this->peekChar)) 
+	{
 		char numberString[MAX_TOEKN_SIZE] = { '\0' };
 		int index = 0;
 		bool isFloat = false;
-		while (isNumber(this->peekChar) || this->peekChar == DOT_CHARACTER && !isFloat) {
-			if (this->peekChar == DOT_CHARACTER) {
+		while (isNumber(this->peekChar) || this->peekChar == DOT_CHARACTER && !isFloat) 
+		{
+			if (this->peekChar == DOT_CHARACTER) 
+			{
 				isFloat = true;
-				this->peekChar = Fd->GetChar();
 				char tempDot = this->peekChar;
+				this->peekChar = Fd->GetChar();
 				Fd->unGetChar(this->peekChar);
-				if (!this->isNumber(this->peekChar)) {
+				if (!this->isNumber(this->peekChar)) 
+				{
 					//error
 					this->errorThrown = true;
+					this->Fd->ReportError("bad float number");
 					return NULL;
 				}
 				this->peekChar = tempDot;
@@ -135,14 +140,15 @@ TOKEN * SCANNER::handleNumbers()
 			numberString[index++] = this->peekChar;
 			this->peekChar = Fd->GetChar();
 		}
-		cout << "This is an integer" << endl;
 		//make sure it's a number 
-		if (isFloat) {
-			cout << "Hello " << atof(numberString) << endl;
+		if (isFloat) 
+		{
+			cout << "float:" << atof(numberString) << endl;
 			return new FLOAT_TOKEN(lx_float, atof(numberString));
 		}
-		else {
-			cout << "Hello " << atoi(numberString) << endl;
+		else
+		{
+			cout << "integer:" << atoi(numberString) << endl;
 			return new INTGER_TOKEN(lx_integer, atoi(numberString));
 		}
 	}

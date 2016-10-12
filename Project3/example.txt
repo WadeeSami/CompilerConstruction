@@ -1,7 +1,9 @@
 ##Hello from the other side
 A := A + 1. - 3 
 A := 8
-
+A := 321.56
+"anan
+"wadee"
 A := A + 10
 
 if ( x > 10 ) then {
