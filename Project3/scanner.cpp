@@ -122,7 +122,7 @@ TOKEN * SCANNER::handleNumbers()
 				{
 					//error
 					this->errorThrown = true;
-					this->Fd->ReportError("bad float number");
+					this->Fd->ReportError("bad float number ");
 					return NULL;
 				}
 				this->peekChar = tempDot;
@@ -161,6 +161,7 @@ TOKEN * SCANNER::handleKeyWords()
 			tempBuffer[index++] = this->peekChar;
 			this->peekChar = Fd->GetChar();
 		} while (isChar(this->peekChar) || isNumber(this->peekChar));
+		Fd->unGetChar(this->peekChar);
 		if (isAKeyword(tempBuffer))
 		{
 			//this is a reserved word, return its token

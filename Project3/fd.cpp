@@ -83,7 +83,7 @@ char FileDescriptor::GetChar()
 void FileDescriptor::ReportError(char * msg)
 {
 	cout << msg;
-	cout << "on line " << GetLineNum() << "of prog.COMP2016" << endl;
+	cout << "on line " << GetLineNum() << " and Char "<< this->char_number<<" of prog.COMP2016" << endl;
 }
 
 void FileDescriptor::unGetChar(char c)
