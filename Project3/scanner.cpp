@@ -130,6 +130,8 @@ TOKEN * SCANNER::handleNumbers()
 			numberString[index++] = this->peekChar;
 			this->peekChar = Fd->GetChar();
 		}
+		//return a charachter
+		Fd->unGetChar(this->peekChar);
 		//make sure it's a number 
 		if (isFloat) 
 		{
