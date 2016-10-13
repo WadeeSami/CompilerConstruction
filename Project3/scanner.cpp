@@ -104,17 +104,7 @@ void SCANNER::skipWhiteSpaces()
 
 TOKEN * SCANNER::handleNumbers()
 {
-	//int v = 0;
-	//if (isNumber(this->peekChar)) 
-	//{
-	//	do 
-	//	{
-	//		v = v * 10 + convertToInteger(this->peekChar);
-	//		this->peekChar = Fd->GetChar();
-	//	} while (isNumber(this->peekChar));
-	//	//return a number token
-	//	return new INTGER_TOKEN(lx_integer, v);
-	//}
+	
 	if (isNumber(this->peekChar)) 
 	{
 		char numberString[MAX_TOEKN_SIZE] = { '\0' };
@@ -292,7 +282,7 @@ void SCANNER::skipComments()
 			//keep reading until you reach other # or the line ends
 			while ((this->peekChar = Fd->GetChar()) != COMMENT_CHAR) {
 				if ((this->peekChar == NEW_LINE_CHAR) || (this->peekChar == '\0')) {
-					cout << "This is a comment" << endl;
+					cout << "This is a long comment" << endl;
 					return;
 				}
 				continue;
@@ -300,7 +290,10 @@ void SCANNER::skipComments()
 
 			//now a comment character in then end of the comment
 			if (Fd->GetChar() == COMMENT_CHAR) {
-				cout << "This is a comment" << endl;
+
+				//skip white spaces
+				this->skipWhiteSpaces();
+				cout << "This is a short comment" << endl;
 				return;
 			}
 			else {
