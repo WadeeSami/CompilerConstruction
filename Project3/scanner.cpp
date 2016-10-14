@@ -215,7 +215,6 @@ TOKEN * SCANNER::handleOperators()
 			this->peekChar = Fd->GetChar();
 			if (this->peekChar == '=')
 			{
-				this->peekChar = Fd->GetChar();
 				return operatorToken = new OPERATOR_TOKEN(lx_le, "<=");
 			}
 			else {
