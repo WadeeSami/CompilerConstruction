@@ -203,7 +203,12 @@ TOKEN * SCANNER::handleOperators()
 			if (this->peekChar == '=')
 			{
 				this->peekChar = Fd->GetChar();
-				return operatorToken = new OPERATOR_TOKEN(lx_ge, ">=");
+				return new OPERATOR_TOKEN(lx_ge, ">=");
+			}
+			else {
+				//return the > alone as an oprator
+				Fd->unGetChar(this->peekChar);
+				return new OPERATOR_TOKEN(lx_gt, ">");
 			}
 			break;
 		case 2:
@@ -213,12 +218,16 @@ TOKEN * SCANNER::handleOperators()
 				this->peekChar = Fd->GetChar();
 				return operatorToken = new OPERATOR_TOKEN(lx_le, "<=");
 			}
+			else {
+				//return the > alone as an oprator
+				Fd->unGetChar(this->peekChar);
+				return new OPERATOR_TOKEN(lx_lt, "<");
+			}
 			break;
 		case 3:
 			this->peekChar = Fd->GetChar();
 			if (this->peekChar == '=')
 			{
-				this->peekChar = Fd->GetChar();
 				return operatorToken = new OPERATOR_TOKEN(lx_colon_eq, ":=");
 			}
 			break;
@@ -226,7 +235,6 @@ TOKEN * SCANNER::handleOperators()
 			this->peekChar = Fd->GetChar();
 			if (this->peekChar == '=')
 			{
-				this->peekChar = Fd->GetChar();
 				return operatorToken = new OPERATOR_TOKEN(lx_neq, "!=");
 			}
 			break;
