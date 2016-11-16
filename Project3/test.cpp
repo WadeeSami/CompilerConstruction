@@ -1,6 +1,7 @@
 #include <iostream>
 #include <regex>
 #include "scanner.h"
+#include "SymbolTable.h"
 using namespace std;
 
 
@@ -23,19 +24,66 @@ int main() {
 		"lx_plus", "lx_minus", "lx_star", "lx_slash",
 		"lx_eq", "lx_neq", "lx_lt", "lx_le", "lx_ge", "lx_ge", "lx_eof"
 	};
-	FileDescriptor *fd = new FileDescriptor("example.txt");
+	//FileDescriptor *fd = new FileDescriptor("example.txt");
 
-	SCANNER scanner(fd);
-	TOKEN * t = NULL;
-	int i = 0;
-	while (fd->GetCurrLine() != NULL) {
-		while ((t = scanner.Scan()) != NULL) {
-			//cout << t->str_ptr ;
-			cout << ++i << "\t" << t->type << "\t" << Lexemes[t->type] << endl;
-		}
-	}
+	//SCANNER scanner(fd);
+	//TOKEN * t = NULL;
+	//int i = 0;
+	//while (fd->GetCurrLine() != NULL) {
+	//	while ((t = scanner.Scan()) != NULL) {
+	//		//cout << t->str_ptr ;
+	//		cout << ++i << "\t" << t->type << "\t" << Lexemes[t->type] << endl;
+	//	}
+	//}
 
+	SymbolTable * globalScope = new SymbolTable(0);
+	/*SymbolTableEntry * ate = globalScope->getSymbol("ss");
+	cout << "The result is" << ate<<endl;*/
+	SymbolTableEntry* steIn = new SymbolTableEntry();
+	steIn->entry_type = ste_var;
+	steIn->f.var.type = type_integer;
+	steIn->name = "X";
 
+	/////
+	SymbolTableEntry* steIn2 = new SymbolTableEntry();
+	steIn2->entry_type = ste_const;
+	steIn2->f.constant.value = 22;
+	steIn2->name = "Const";
+
+	///
+	globalScope->putSymbol(steIn->name, steIn);
+	globalScope->putSymbol(steIn2->name, steIn2);
+	//SymbolTableEntry * ate = globalScope->getSymbol(steIn->name);
+	//cout << "The result is" << ate->name;
+	//cout << "The result is" << ate->f.var.type;
+	/////
+	SymbolTableEntry * ate2 = new SymbolTableEntry();// = globalScope->getSymbol(steIn2->name);
+	//cout << "The result is" << ate2->name;
+	//cout << "The result is" << ate2->f.constant.value;
+	/////
+	SymbolTable* childScope = globalScope->addNewScope();
+	ate2->entry_type = ste_const;
+	ate2->f.constant.value = 768;
+	ate2->name = "Const2";
+	childScope->putSymbol(ate2->name, ate2);
+	SymbolTableEntry * ate3 = childScope->getSymbol(ate2->name);
+	cout << "The result is" << ate3->f.constant.value;
+	///
+	ate3 = childScope->getSymbol("Const");
+	cout << "searching for const \n";
+	cout << "The result is" << ate3->f.constant.value;
+	///////3
+	SymbolTable* childScope2 = childScope->addNewScope();
+	ate2->entry_type = ste_const;
+	ate2->f.constant.value = 333;
+	ate2->name = "Const3";
+	childScope2->putSymbol(ate2->name, ate2);
+	ate3 = childScope2->getSymbol(ate2->name);
+	cout << "The result is" << ate3->f.constant.value;
+	///
+	ate3 = childScope2->getSymbol("Const");
+	cout << "searching for const \n";
+	cout << "The result is" << ate3->f.constant.value;
 	int x = 0;
 	cin >> x;
 	return 0;
